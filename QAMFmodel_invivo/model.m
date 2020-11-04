@@ -51,7 +51,7 @@ O2_x = a_3 * PO2;   % mol (L matrix water)^(-1)
 % Volume fractions and water space fractions 
 V_c   = fixedpars.fractions.V_c;        % (L cyto) (L cell)^(-1)
 V_m   = fixedpars.fractions.V_m;        % (L mito) (L cell)^(-1)
-R_m2c = fixedpars.fractions.R_m2c;      % (L mito) (L cyto)^(-1)
+V_m2c = fixedpars.fractions.V_m2c;      % (L mito) (L cyto)^(-1)
 W_c   = fixedpars.fractions.W_c;        % (L cyto water) (L cyto)^(-1)
 W_x   = fixedpars.fractions.W_x;        % (L matrix water) (L mito)^(-1)
 W_i   = fixedpars.fractions.W_i;        % (L IM water) (L mito)^(-1)
@@ -318,9 +318,9 @@ dQH2_x  = (J_C1  - J_C3) / W_x;
 dcred_i = 2 * (J_C3 - J_C4) / W_i; 
 
 % Buffer species
-dATP_c = ( R_m2c * J_ANT - J_AtC + J_CK + J_AK) / W_c;  
-dADP_c = (-R_m2c * J_ANT + J_AtC - J_CK - 2*J_AK) / W_c; 
-dPi_c  = (-R_m2c * J_PiC + J_AtC) / W_c; 
+dATP_c = ( V_m2c * J_ANT - J_AtC + J_CK + J_AK) / W_c;  
+dADP_c = (-V_m2c * J_ANT + J_AtC - J_CK - 2*J_AK) / W_c; 
+dPi_c  = (-V_m2c * J_PiC + J_AtC) / W_c; 
 dAMP_c = J_AK / W_c; 
 dCrP_c = -J_CK / W_c;
 

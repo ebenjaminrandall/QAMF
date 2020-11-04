@@ -22,7 +22,7 @@ capacitance.
 % Volume fractions and water space fractions
 V_c = 0.6601;       % cytosol volume fraction       % L cyto (L cell)^(-1)
 V_m = 0.2882;       % mitochondrial volume fraction % L mito (L cell)^(-1)
-R_m2c = V_m / V_c;  % mito to cyto volume ratio     % L mito (L cyto)^(-1)
+V_m2c = V_m / V_c;  % mito to cyto volume ratio     % L mito (L cyto)^(-1)
 W_c = 0.8425;       % cytosol water space           % L cyto water (L cyto)^(-1) 
 W_m = 0.7238;       % mitochondrial water space     % L mito water (L mito)^(-1)
 W_x = 0.9*W_m;      % matrix water space            % L matrix water (L mito)^(-1)
@@ -30,7 +30,7 @@ W_i = 0.1*W_m;      % intermembrane water space     % L IM water (L mito)^(-1)
 
 fixedpars.fractions.V_c = V_c; 
 fixedpars.fractions.V_m = V_m; 
-fixedpars.fractions.R_m2c = R_m2c; 
+fixedpars.fractions.V_m2c = V_m2c; 
 fixedpars.fractions.W_c = W_c; 
 fixedpars.fractions.W_m = W_m; 
 fixedpars.fractions.W_x = W_x; 
