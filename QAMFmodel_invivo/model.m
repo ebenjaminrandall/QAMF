@@ -241,7 +241,7 @@ term2 = k3_ANT * ADP_x * ATP_c / K0_T;
 num   = term1 - term2;
 den   = (1 + ATP_c/K0_T + ADP_c/K0_D) * (ADP_x + ATP_x * q);
 
-% Flux (mol (s * L mito water)^(-1))
+% Flux (mol (s * L mito)^(-1))
 J_ANT = E_ANT * num / den; 
 
 %% H+-PI2 cotransporter
