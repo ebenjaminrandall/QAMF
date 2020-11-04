@@ -70,7 +70,7 @@ Cm = fixedpars.capacitance.Cm;
 % Thermochemical constants
 R = 8.314;          % J (mol K)^(-1)
 T = 37 + 273.15;    % K 
-F = 96484;          % C mol^(-1)
+F = 96485;          % C mol^(-1)
 
 % Proton motive force parameters (dimensionless) 
 n_F  = 8/3; 
@@ -198,7 +198,7 @@ Kapp_C4 = Keq_C4 * H_x^n_C4 / H_c^(n_C4 - 2);
 J_C4 = X_C4 *(Kapp_C4 * cred_i^2 * O2_x^0.5 - cox_i^2) * ...
     (1 / (1 + k_O2 / O2_x));
 
-%% F1F0-ATPase
+%% F0F1-ATPase
 % ADP3-_x + HPO42-_x + H+_x + 8/3 H+_i <-> ATP4- + H2O + 8/3 H+_x
 
 % Gibb's energy (J mol^(-1))
