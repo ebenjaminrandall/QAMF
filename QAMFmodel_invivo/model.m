@@ -219,8 +219,8 @@ del_D   = 0.0167;
 del_T   = 0.0699;
 k2o_ANT = 9.54/60;      % s^(-1)
 k3o_ANT = 30.05/60;     % s^(-1)
-K0o_D   = 38.89e-6;     % mol (L cyto water)^(-1) 
-K0o_T   = 56.05e-6;     % mol (L cyto water)^(-1)
+Ko_D0   = 38.89e-6;     % mol (L cyto water)^(-1) 
+Ko_T0   = 56.05e-6;     % mol (L cyto water)^(-1)
 A       = +0.2829;
 B       = -0.2086;
 C       = +0.2372;
@@ -232,14 +232,14 @@ k2_ANT = k2o_ANT * exp((A * (-3) + B * (-4) + C) * phi);
 k3_ANT = k3o_ANT * exp((A * (-4) + B * (-3) + C) * phi);
 
 % Dissociation constants (mol (L cyto water)^(-1))
-K0_D = K0o_D * exp(3 * del_D * phi);
-K0_T = K0o_T * exp(4 * del_T * phi);
+Ko_D = Ko_D0 * exp(3 * del_D * phi);
+Ko_T = Ko_T0 * exp(4 * del_T * phi);
 
-q     = k3_ANT * K0_D * exp(phi) / (k2_ANT * K0_T);
-term1 = k2_ANT * ATP_x * ADP_c * q / K0_D;
-term2 = k3_ANT * ADP_x * ATP_c / K0_T;
+q     = k3_ANT * Ko_D * exp(phi) / (k2_ANT * Ko_T);
+term1 = k2_ANT * ATP_x * ADP_c * q / Ko_D;
+term2 = k3_ANT * ADP_x * ATP_c / Ko_T;
 num   = term1 - term2;
-den   = (1 + ATP_c/K0_T + ADP_c/K0_D) * (ADP_x + ATP_x * q);
+den   = (1 + ATP_c/Ko_T + ADP_c/Ko_D) * (ADP_x + ATP_x * q);
 
 % Flux (mol (s * L mito)^(-1))
 J_ANT = E_ANT * num / den; 

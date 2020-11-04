@@ -22,7 +22,7 @@ X_C1  = pars(2);  % mol (s * L mito)^(-1)
 X_C3  = pars(3);  % mol (s * L mito)^(-1)
 X_C4  = pars(4);  % mol (s * L mito)^(-1)
 X_F   = pars(5);  % mol (s * L mito)^(-1)
-E_ANT = pars(6);  % (L matrix water) (L mito)^(-1)
+E_ANT = pars(6);  % mol (L mito)^(-1)
 E_PiC = pars(7);  % (L cell) (s * L mito)^(-1)
 X_CK  = pars(8);  % mol (s * L cyto)^(-1)
 X_AtC = pars(9);  % mol (s * L cyto)^(-1)
@@ -51,7 +51,7 @@ O2_x = a_3 * PO2;   % mol (L matrix water)^(-1)
 % Volume fractions and water space fractions 
 V_c   = fixedpars.fractions.V_c;        % (L cyto) (L cell)^(-1)
 V_m   = fixedpars.fractions.V_m;        % (L mito) (L cell)^(-1)
-R_m2c = fixedpars.fractions.R_m2c;      % (L mito) (L cyto)^(-1)
+V_m2c = fixedpars.fractions.V_m2c;      % (L mito) (L cyto)^(-1)
 W_c   = fixedpars.fractions.W_c;        % (L cyto water) (L cyto)^(-1)
 W_x   = fixedpars.fractions.W_x;        % (L matrix water) (L mito)^(-1)
 W_i   = fixedpars.fractions.W_i;        % (L IM water) (L mito)^(-1)
@@ -63,14 +63,14 @@ c_tot    = fixedpars.pools.c_tot;       % mol (L matrix water)^(-1)
 Cr_tot_c = fixedpars.pools.Cr_tot_c;    % mol (L cyto water)^(-1) 
 
 % Membrane capacitance 
-Cm = fixedpars.capacitance.Cm; 
+Cm = fixedpars.capacitance.Cm;          % mol (V * L mito)^(-1)
 
 %%  Listing fixed model parameters
 
 % Thermochemical constants
 R = 8.314;          % J (mol K)^(-1)
 T = 37 + 273.15;    % K 
-F = 96484;          % C mol^(-1)
+F = 96485;          % C mol^(-1)
 
 % Proton motive force parameters (dimensionless) 
 n_F  = 8/3; 
@@ -79,18 +79,18 @@ n_C3 = 2;
 n_C4 = 4; 
 
 % Dissociation constants (M)
-K_HATP = 10^(-6.59);  
-K_MATP = 10^(-3.82);  
-K_KATP = 10^(-1.013); 
-K_HADP = 10^(-6.42);  
-K_MADP = 10^(-2.79);  
-K_KADP = 10^(-0.882);
-K_HPi  = 10^(-6.71);  
-K_MPi  = 10^(-1.69);  
-K_KPi  = 10^(+0.0074);
-K_HAMP = 10^(-6.22); 
-K_MAMP = 10^(-1.86); 
-K_KAMP = 10^(-0.6215); 
+K_MgATP = 10^(-3.88);  
+K_HATP  = 10^(-6.33);  
+K_KATP  = 10^(-1.02); 
+K_MgADP = 10^(-3.00);  
+K_HADP  = 10^(-6.26);  
+K_KADP  = 10^(-0.89);
+K_MgAMP = 10^(-1.86); 
+K_HAMP  = 10^(-6.22); 
+K_KAMP  = 10^(-1.05); 
+K_MgPi  = 10^(-1.66);  
+K_HPi   = 10^(-6.62);  
+K_KPi   = 10^(-0.42);
 
 %% Loading values of state variables
 
@@ -123,15 +123,15 @@ Cr_c  = Cr_tot_c - CrP_c;  % mol (L cyto water)^(-1)
 %% Binding polynomials 
 
 % Matrix species % mol (L mito water)^(-1)
-PATP_x = 1 + H_x/K_HATP + Mg_x/K_MATP + K_x/K_KATP;
-PADP_x = 1 + H_x/K_HADP + Mg_x/K_MADP + K_x/K_KADP;
-PPi_x  = 1 + H_x/K_HPi  + Mg_x/K_MPi  + K_x/K_KPi; 
+PATP_x = 1 + H_x/K_HATP + Mg_x/K_MgATP + K_x/K_KATP;
+PADP_x = 1 + H_x/K_HADP + Mg_x/K_MgADP + K_x/K_KADP;
+PPi_x  = 1 + H_x/K_HPi  + Mg_x/K_MgPi  + K_x/K_KPi; 
 
 % Cytosol species % mol (L cyto water)^(-1)
-PATP_c = 1 + H_c/K_HATP + Mg_c/K_MATP + K_c/K_KATP;
-PADP_c = 1 + H_c/K_HADP + Mg_c/K_MADP + K_c/K_KADP;
-PPi_c  = 1 + H_c/K_HPi  + Mg_c/K_MPi  + K_c/K_KPi;
-PAMP_c = 1 + H_c/K_HAMP + Mg_c/K_MAMP + K_c/K_KAMP; 
+PATP_c = 1 + H_c/K_HATP + Mg_c/K_MgATP + K_c/K_KATP;
+PADP_c = 1 + H_c/K_HADP + Mg_c/K_MgADP + K_c/K_KADP;
+PPi_c  = 1 + H_c/K_HPi  + Mg_c/K_MgPi  + K_c/K_KPi;
+PAMP_c = 1 + H_c/K_HAMP + Mg_c/K_MgAMP + K_c/K_KAMP; 
 
 %% Unbound species 
 
@@ -198,7 +198,7 @@ Kapp_C4 = Keq_C4 * H_x^n_C4 / H_c^(n_C4 - 2);
 J_C4 = X_C4 *(Kapp_C4 * cred_i^2 * O2_x^0.5 - cox_i^2) * ...
     (1 / (1 + k_O2 / O2_x));
 
-%% F1F0-ATPase
+%% F0F1-ATPase
 % ADP3-_x + HPO42-_x + H+_x + 8/3 H+_i <-> ATP4- + H2O + 8/3 H+_x
 
 % Gibb's energy (J mol^(-1))
@@ -206,7 +206,7 @@ DrGo_F = -4510;
 
 % Equilibrium constants (dimensionless)
 Keq_F  = exp(-(DrGo_F - n_F * F * DPsi) / (R * T));
-Kapp_F = Keq_F * H_c^n_F / H_x^(n_F-1) * PATP_x / (PADP_x * PPi_x) * K_MATP / K_MADP;
+Kapp_F = Keq_F * H_c^n_F / H_x^(n_F-1) * PATP_x / (PADP_x * PPi_x) * K_MgATP / K_MgADP;
 
 % Flux (mol (s * L mito)^(-1))
 J_F = X_F * (Kapp_F * sumADP_x * sumPi_x - sumATP_x);
@@ -219,8 +219,8 @@ del_D   = 0.0167;
 del_T   = 0.0699;
 k2o_ANT = 9.54/60;      % s^(-1)
 k3o_ANT = 30.05/60;     % s^(-1)
-K0o_D   = 38.89e-6;     % mol (L cyto water)^(-1) 
-K0o_T   = 56.05e-6;     % mol (L cyto water)^(-1)
+Ko_D0   = 38.89e-6;     % mol (L cyto water)^(-1) 
+Ko_T0   = 56.05e-6;     % mol (L cyto water)^(-1)
 A       = +0.2829;
 B       = -0.2086;
 C       = +0.2372;
@@ -232,16 +232,16 @@ k2_ANT = k2o_ANT * exp((A * (-3) + B * (-4) + C) * phi);
 k3_ANT = k3o_ANT * exp((A * (-4) + B * (-3) + C) * phi);
 
 % Dissociation constants (mol (L cyto water)^(-1))
-K0_D = K0o_D * exp(3 * del_D * phi);
-K0_T = K0o_T * exp(4 * del_T * phi);
+Ko_D = Ko_D0 * exp(3 * del_D * phi);
+Ko_T = Ko_T0 * exp(4 * del_T * phi);
 
-q     = k3_ANT * K0_D * exp(phi) / (k2_ANT * K0_T);
-term1 = k2_ANT * ATP_x * ADP_c * q / K0_D;
-term2 = k3_ANT * ADP_x * ATP_c / K0_T;
+q     = k3_ANT * Ko_D * exp(phi) / (k2_ANT * Ko_T);
+term1 = k2_ANT * ATP_x * ADP_c * q / Ko_D;
+term2 = k3_ANT * ADP_x * ATP_c / Ko_T;
 num   = term1 - term2;
-den   = (1 + ATP_c/K0_T + ADP_c/K0_D) * (ADP_x + ATP_x * q);
+den   = (1 + ATP_c/Ko_T + ADP_c/Ko_D) * (ADP_x + ATP_x * q);
 
-% Flux (mol (s * L mito water)^(-1))
+% Flux (mol (s * L mito)^(-1))
 J_ANT = E_ANT * num / den; 
 
 %% H+-PI2 cotransporter
@@ -318,9 +318,9 @@ dQH2_x  = (J_C1  - J_C3) / W_x;
 dcred_i = 2 * (J_C3 - J_C4) / W_i; 
 
 % Buffer species
-dATP_c = ( R_m2c * J_ANT - J_AtC + J_CK + J_AK) / W_c;  
-dADP_c = (-R_m2c * J_ANT + J_AtC - J_CK - 2*J_AK) / W_c; 
-dPi_c  = (-R_m2c * J_PiC + J_AtC) / W_c; 
+dATP_c = ( V_m2c * J_ANT - J_AtC + J_CK + J_AK) / W_c;  
+dADP_c = (-V_m2c * J_ANT + J_AtC - J_CK - 2*J_AK) / W_c; 
+dPi_c  = (-V_m2c * J_PiC + J_AtC) / W_c; 
 dAMP_c = J_AK / W_c; 
 dCrP_c = -J_CK / W_c;
 
