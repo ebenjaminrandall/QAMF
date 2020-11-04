@@ -63,7 +63,7 @@ c_tot    = fixedpars.pools.c_tot;       % mol (L matrix water)^(-1)
 Cr_tot_c = fixedpars.pools.Cr_tot_c;    % mol (L cyto water)^(-1) 
 
 % Membrane capacitance 
-Cm = fixedpars.capacitance.Cm; 
+Cm = fixedpars.capacitance.Cm;          % mol (V * L mito)^(-1)
 
 %%  Listing fixed model parameters
 
