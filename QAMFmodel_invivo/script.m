@@ -274,7 +274,7 @@ p = pars;
 CrP_ATP = zeros(size(X_AtC)); 
 Pi_c = zeros(size(X_AtC)); 
 for i = 1:length(X_AtC)
-    p(9) = X_AtC(i) * V_c; % reassign value for X_AtC and convert to mol (s * L cyto)^(-1)
+    p(9) = X_AtC(i); % reassign value for X_AtC
     [t,x] = ode15s(@model,[0 60],x0,[],p,conc,fixedpars,1,Hleakon);
     
     sumATP_x_cell = x(end,2) * (V_m * W_x); 
