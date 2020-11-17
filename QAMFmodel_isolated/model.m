@@ -248,21 +248,15 @@ J_ANT = E_ANT * num / den;
 % H2PO42-_x + H+_x = H2PO42-_c + H+_c
 
 % Constant
-k_PiC = 0.0016125;  % mol (L cell)^(-1)
+k_PiC = 1.61e-3;  % mol (L cell)^(-1)
 
 % [H2P04-] 
 HPi_c = Pi_c * (H_c / K_HPi);
 HPi_x = Pi_x * (H_x / K_HPi);
 
-% convert to mol (L cell)^(-1)
-% H_c_cell = H_c * (V_c * W_c + V_m * W_i); 
-% H_x_cell = H_x * V_m * W_x; 
-% HPi_c_cell = HPi_c * (V_c * W_c + V_m * W_i); 
-% HPi_x_cell = HPi_x * V_m * W_x; 
-
 % Flux (mol (s * L mito)^(-1))
 J_PiC = E_PiC * (H_c * HPi_c - H_x * HPi_x ) / ... 
-    (k_PiC * (1 + HPi_c/k_PiC) * (1 + HPi_x/k_PiC));
+    (k_PiC +  HPi_c);
 
 %% Creatine kinase reaction
 % ADP3- + CrP2- + H+ = ATP4- + Cr
@@ -286,10 +280,16 @@ J_AK = 0; %X_AK * (Kapp_AK * ADP_c^2 - AMP_c * ATP_c);
 
 if Hleakon == 1
     % Constants
-    X_H = 10000e2; %1e2;  % mol (s * L mito)^(-1))
+    %X_H = 10000e2; %1e2;  % mol (s * L mito)^(-1))
     
     % Flux (mol (s * L mito)^(-1))
-    J_H = X_H * DPsi * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
+    %J_H = X_H * DPsi * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
+    
+    % New Version:
+    
+    P_leak = 1.78e3; % mol/s/lmito/M
+    J_H = P_leak * (H_c * exp(F * DPsi / (2 * R * T)) - H_x * exp(-F * DPsi / (2 * R * T)));
+    
 else
     J_H = 0;
 end 

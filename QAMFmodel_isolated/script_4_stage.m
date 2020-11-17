@@ -156,7 +156,7 @@ pars = [X_DH; X_C1; X_C3; X_C4;
 
 % State 1
 t_1_stop = 180; % 1430;
-[t_1,x_1] = ode15s(@model,[0 t_1_stop] ,x0,[],pars,conc,fixedpars,flags,Hleakon);
+[t_1,x_1] = ode15s(@model,linspace(0, t_1_stop-1e-9, 500) ,x0,[],pars,conc,fixedpars,flags,Hleakon);
 
 % State 2
 t_2_stop = 360; % 1640;
@@ -165,15 +165,15 @@ pars = [X_DH; X_C1; X_C3; X_C4;
     X_F; E_ANT; E_PiC; 
     X_CK; X_AtC; X_AK;
     ]; 
-[t_2,x_2] = ode15s(@model,[0 t_2_stop - t_1_stop],x_1(end,:),[],pars,conc,fixedpars,flags,Hleakon);
+[t_2,x_2] = ode15s(@model,linspace(t_1_stop, t_2_stop-1e-9, 500),x_1(end,:),[],pars,conc,fixedpars,flags,Hleakon);
 
 
 % State 3 and 4
 t_final = 600; % 2300;
 x_2(end,9) = 250e-6 + x_2(end,9); % Adding in 250 uM 
-[t_3,x_3] = ode15s(@model,[0 t_final - t_2_stop],x_2(end,:),[],pars,conc,fixedpars,flags,Hleakon);
+[t_3,x_3] = ode15s(@model,linspace(t_2_stop, t_final-1e-9,500),x_2(end,:),[],pars,conc,fixedpars,flags,Hleakon);
 
-t = vertcat(t_1,t_2+t_1_stop,t_3+t_2_stop);
+t = vertcat(t_1,t_2,t_3);
 x = vertcat(x_1, x_2, x_3);
 
 %% Compute function values over all time 
@@ -307,4 +307,7 @@ end
 % end
 % figure();
 % plot(new_t, new_MVO2);  
-%ode15s(@dXdT_electrode, [0 360], 0.1,[],new_t, new_MVO2);
+
+
+[t_f,x_f]= ode15s(@dXdT_electrode, [0 360], 0.1,[],t, MVO2);
+plot(t_f, x_f);
