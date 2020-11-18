@@ -9,7 +9,7 @@ This section sets certain flags within the code:
     printon     prints the figures at the end of the the code
 %}
 flags   = 1;    % 1 - solves model for dXdT;    2 - solves for auxiliary equations
-Hleakon = 0;    % 0 - does not use H+ leak;     1 - uses H+ leak
+Hleakon = 1;    % 0 - does not use H+ leak;     1 - uses H+ leak
 printon = 0;    % 0 - does not print figues;    1 - prints figures 
 
 %% Fixed parameters and specifications 
@@ -88,10 +88,10 @@ X_C1  = 3e5;       % mol (s * L mito)^(-1)             %32365;
 X_C3  = 3e7;       % mol (s * L mito)^(-1)             %0.79081* 40 * 1e5;
 X_C4  = 7.5;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
 X_F   = 1e4;       % mol (s * L mito)^(-1)             %100; 
-E_ANT = 1;       % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
+E_ANT = 1;         % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
 E_PiC = 3e7;       % (L cell) (s * L mito)^(-1)        %3.3356e+07 * 2e-2; 
 X_CK  = 1e7;       % mol (s * L cyto)^(-1) 
-X_AtC = 0.5e-3;   % mol (s * L cyto)^(-1)
+X_AtC = 0.5e-3;    % mol (s * L cyto)^(-1)
 X_AK  = 1e8;       % mol (s * L cyto)^(-1) 
 
 pars = [X_DH; X_C1; X_C3; X_C4; 
@@ -111,21 +111,21 @@ cytoplasm.
 DPsi_0    = 175*1e-3;       % V
 
 % Matrix species 
-ATP_x_0   = 0.5e-3;         % mol (L matrix water)^(-1)
-ADP_x_0   = 9.5e-3;         % mol (L matrix water)^(-1)
-Pi_x_0    = 0.3e-3;         % mol (L matrix water)^(-1)
-NADH_x_0  = 2/3 * NAD_tot;  % mol (L matrix water)^(-1)
-QH2_x_0   = Q_tot/2;        % mol (L matrix water)^(-1)
+ATP_x_0  = 0.5e-3;         % mol (L matrix water)^(-1)
+ADP_x_0  = 9.5e-3;         % mol (L matrix water)^(-1)
+Pi_x_0   = 0.3e-3;         % mol (L matrix water)^(-1)
+NADH_x_0 = 2/3 * NAD_tot;  % mol (L matrix water)^(-1)
+QH2_x_0  = Q_tot/2;        % mol (L matrix water)^(-1)
 
 % IM species
 cred_i_0  = c_tot/3;        % mol (L IM water)^(-1)
 
 % Cytoplasmic species
-ATP_c_0   = 9.95e-3;        % mol (L cyto water)^(-1)
-ADP_c_0   = 0.05e-3;        % mol (L cyto water)^(-1)
-Pi_c_0    = 2.0e-3;         % mol (L cyto water)^(-1)
-AMP_c_0   = 1e-6;           % mol (L cyto water)^(-1)
-CrP_c_0   = .3 * Cr_tot_c;  % mol (L cyto water)^(-1)
+ATP_c_0 = 9.95e-3;        % mol (L cyto water)^(-1)
+ADP_c_0 = 0.05e-3;        % mol (L cyto water)^(-1)
+Pi_c_0  = 2.0e-3;         % mol (L cyto water)^(-1)
+AMP_c_0 = 1e-6;           % mol (L cyto water)^(-1)
+CrP_c_0 = .3 * Cr_tot_c;  % mol (L cyto water)^(-1)
 
 x0 = [DPsi_0; 
     ATP_x_0; ADP_x_0; Pi_x_0; NADH_x_0; QH2_x_0; 
@@ -269,7 +269,7 @@ rate increases.
 clear CrP_ATP
 
 % Range of ATP hydrolysis from 0.36 to 1.2e-3 mmol (s * L cell)^(-1)
-X_AtC = (0.36:0.1:1.52) * 1e-3 / V_c; % convert to mol (s * L cyto)^(-1)
+X_AtC = (0.1:0.1:1.52) * 1e-3 / V_c; % convert to mol (s * L cyto)^(-1)
 p = pars; 
 
 CrP_ATP = zeros(size(X_AtC)); 

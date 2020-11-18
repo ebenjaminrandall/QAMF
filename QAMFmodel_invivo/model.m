@@ -255,7 +255,7 @@ HPi_c = Pi_c * (H_c / K_HPi);
 HPi_x = Pi_x * (H_x / K_HPi);
 
 % Flux (mol (s * L mito)^(-1))
-J_PiC = E_PiC * (H_c * HPi_c - H_x * HPi_x ) / (k_PiC + HPi_c);
+J_PiC = E_PiC * (H_c * HPi_c - H_x * HPi_x) / (k_PiC + HPi_c);
 
 %% Creatine kinase reaction
 % ADP3- + CrP2- + H+ = ATP4- + Cr
@@ -287,10 +287,10 @@ J_AK = X_AK * (Kapp_AK * ADP_c^2 - AMP_c * ATP_c);
 
 if Hleakon == 1
     % Constants
-    X_H = 1e2;  % mol (s * L mito)^(-1))
+    X_H = 2e-2;  % mol (s * L mito)^(-1))
     
     % Flux (mol (s * L mito)^(-1))
-    J_H = X_H * DPsi * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
+    J_H = X_H * DPsi * F^2 / (R * T) * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
 else
     J_H = 0;
 end 
