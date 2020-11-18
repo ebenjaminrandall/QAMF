@@ -1,4 +1,4 @@
-function [dxdt,f] = model(~,x,pars,conc,fixedpars,flags,Hleakon)
+function [dxdt,f] = model(~,x,pars,conc,fixedpars,flags)
 %{
 This function calculates time derivatives of state variables of the 
 cell-level cardaic energetics. 
@@ -9,7 +9,6 @@ Inputs:
             pressure
     flags   scalar that if set to 1, solves dxdt and otherwise solves
             auxiliary equations 
-    Hleakon scalar that if set to 1, uses the H+ leak and otherwise doesn't
 Outputs: 
     dxdt    vector of the time derivatives of model states 
     f       vector of binding polynomials and fluxes calculated 
@@ -24,9 +23,10 @@ X_C4  = pars(4);  % mol (s * L mito)^(-1)
 X_F   = pars(5);  % mol (s * L mito)^(-1)
 E_ANT = pars(6);  % mol (L mito)^(-1)
 E_PiC = pars(7);  % (L cell) (s * L mito)^(-1)
-X_CK  = pars(8);  % mol (s * L cyto)^(-1)
-X_AtC = pars(9);  % mol (s * L cyto)^(-1)
-X_AK  = pars(10); % mol (s * L cyto)^(-1)
+E_H   = pars(8);  % mol (s * V * L mito)^(-1)
+X_CK  = pars(9);  % mol (s * L cyto)^(-1)
+X_AtC = pars(10); % mol (s * L cyto)^(-1)
+X_AK  = pars(11); % mol (s * L cyto)^(-1)
 
 %% Upack pH, cation concentrations and O2 partial pressure vector
 
@@ -285,15 +285,8 @@ J_AK = X_AK * (Kapp_AK * ADP_c^2 - AMP_c * ATP_c);
 
 %% H+ Leak
 
-if Hleakon == 1
-    % Constants
-    X_H = 2e-2;  % mol (s * L mito)^(-1))
-    
-    % Flux (mol (s * L mito)^(-1))
-    J_H = X_H * DPsi * F^2 / (R * T) * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
-else
-    J_H = 0;
-end 
+% Flux (mol (s * L mito)^(-1))
+J_H = E_H * DPsi * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
 
 %% Computing time derivatives of state variables
 

@@ -5,11 +5,9 @@
 This section sets certain flags within the code: 
     flags       determines whether the model solves for dXdT or solves the
                 auxiliary equations 
-    Hleakon     uses the H+ leak flux if turned on (set to 1)
     printon     prints the figures at the end of the the code
 %}
 flags   = 1;    % 1 - solves model for dXdT;    2 - solves for auxiliary equations
-Hleakon = 1;    % 0 - does not use H+ leak;     1 - uses H+ leak
 printon = 0;    % 0 - does not print figues;    1 - prints figures 
 
 %% Fixed parameters and specifications 
@@ -90,13 +88,14 @@ X_C4  = 7.5;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
 X_F   = 1e4;       % mol (s * L mito)^(-1)             %100; 
 E_ANT = 1;         % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
 E_PiC = 3e7;       % (L cell) (s * L mito)^(-1)        %3.3356e+07 * 2e-2; 
+E_H   = 1e5;       % mol (s * V * L mito)^(-1)
 X_CK  = 1e7;       % mol (s * L cyto)^(-1) 
 X_AtC = 0.5e-3;    % mol (s * L cyto)^(-1)
 X_AK  = 1e8;       % mol (s * L cyto)^(-1) 
 
-pars = [X_DH; X_C1; X_C3; X_C4; 
-    X_F; E_ANT; E_PiC; 
-    X_CK; X_AtC; X_AK;
+pars = [X_DH; X_C1; X_C3; X_C4; X_F; 
+    E_ANT; E_PiC; E_H; 
+    X_CK; X_AtC; X_AK; 
     ]; 
 
 %% Initial conditions 
@@ -140,12 +139,12 @@ outputs are converted to the appropriate units for plotting. Plots can be
 printed by setting printon = 1 in the Flags section. 
 %} 
 
-[t,x] = ode15s(@model,[0 60],x0,[],pars,conc,fixedpars,flags,Hleakon);
+[t,x] = ode15s(@model,[0 60],x0,[],pars,conc,fixedpars,flags);
 
 % Find steady-state fluxes and polynomials 
 f = zeros(15,length(t)); 
 for i = 1:length(t)
-    [~,f1] = model([],x(i,:),pars,conc,fixedpars,2,Hleakon); 
+    [~,f1] = model([],x(i,:),pars,conc,fixedpars,2); 
     f(:,i) = f1; 
 end 
 
@@ -275,8 +274,8 @@ p = pars;
 CrP_ATP = zeros(size(X_AtC)); 
 Pi_c = zeros(size(X_AtC)); 
 for i = 1:length(X_AtC)
-    p(9) = X_AtC(i); % reassign value for X_AtC
-    [t,x] = ode15s(@model,[0 60],x0,[],p,conc,fixedpars,1,Hleakon);
+    p(10) = X_AtC(i); % reassign value for X_AtC
+    [t,x] = ode15s(@model,[0 60],x0,[],p,conc,fixedpars,1);
     
     sumATP_x_cell = x(end,2) * (V_m * W_x); 
     sumATP_c_cell = x(end,8) * (V_c * W_c + V_m * W_i); 
