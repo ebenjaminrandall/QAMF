@@ -86,8 +86,8 @@ rates.
 X_DH  = 0.1;       % mol (s * L mito)^(-1)             %0.0866;
 X_C1  = 3e5;       % mol (s * L mito)^(-1)             %32365;
 X_C3  = 3e7;       % mol (s * L mito)^(-1)             %0.79081* 40 * 1e5;
-X_C4  = 0.7;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
-X_F   = 100;       % mol (s * L mito)^(-1)             %100; 
+X_C4  = 7.5;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
+X_F   = 1e4;       % mol (s * L mito)^(-1)             %100; 
 E_ANT = 1;       % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
 E_PiC = 3e7;       % (L cell) (s * L mito)^(-1)        %3.3356e+07 * 2e-2; 
 X_CK  = 1e7;       % mol (s * L cyto)^(-1) 
@@ -123,7 +123,7 @@ cred_i_0  = c_tot/3;        % mol (L IM water)^(-1)
 % Cytoplasmic species
 ATP_c_0   = 9.95e-3;        % mol (L cyto water)^(-1)
 ADP_c_0   = 0.05e-3;        % mol (L cyto water)^(-1)
-Pi_c_0    = 1.0e-3;         % mol (L cyto water)^(-1)
+Pi_c_0    = 2.0e-3;         % mol (L cyto water)^(-1)
 AMP_c_0   = 1e-6;           % mol (L cyto water)^(-1)
 CrP_c_0   = .3 * Cr_tot_c;  % mol (L cyto water)^(-1)
 
