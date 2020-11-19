@@ -39,7 +39,7 @@ NAD_tot = 2.97e-3;  % NAD+ and NADH conc            % mol (L matrix water)^(-1)
 Q_tot   = 1.35e-3;  % Q and QH2 conc                % mol (L matrix water)^(-1) 
 c_tot   = 2.7e-3;   % cytochrome c ox and red conc  % mol (L IM water)^(-1)
 
-Cr_tot  = 40e-3;    % creatine and creatine phosphate conc % mol (L cell)^(-1)
+Cr_tot  = 35e-3;    % creatine and creatine phosphate conc % mol (L cell)^(-1)
 Cr_tot_c = Cr_tot / (V_c * W_c); % convert to mol (L cyto water)^(-1)
 
 fixedpars.pools.NAD_tot = NAD_tot; 
@@ -48,7 +48,7 @@ fixedpars.pools.c_tot = c_tot;
 fixedpars.pools.Cr_tot_c = Cr_tot_c; 
 
 % Membrane capacitance 
-Cm = 3.11e-6;       % mol (V * L mito)^(-1)
+Cm = 3e-6;       % mol (V * L mito)^(-1)
 
 fixedpars.capacitance.Cm = Cm; 
 
@@ -59,8 +59,8 @@ the O2 partial pressure.
 %} 
 
 % pH 
-pH_x = 7.35; 
-pH_c = 7.15; 
+pH_x = 7.4; 
+pH_c = 7.2; 
 
 % K+ concentrations 
 K_x  = 100e-3;      % mol (L matrix water)^(-1)
@@ -81,21 +81,20 @@ This section creates a vector of adjustable parameters, namely the flux
 rates. 
 %} 
 
-X_DH  = 0.1;       % mol (s * L mito)^(-1)             %0.0866;
+X_DH  = 0.0866;       % mol (s * L mito)^(-1)             %0.0866;
 X_C1  = 3e5;       % mol (s * L mito)^(-1)             %32365;
-X_C3  = 3e7;       % mol (s * L mito)^(-1)             %0.79081* 40 * 1e5;
-X_C4  = 7.5;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
-X_F   = 1e4;       % mol (s * L mito)^(-1)             %100; 
-E_ANT = 1;         % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
-E_PiC = 3e7;       % (L cell) (s * L mito)^(-1)        %3.3356e+07 * 2e-2; 
-E_H   = 1e5;       % mol (s * V * L mito)^(-1)
+X_C3  = 5e7;       % mol (s * L mito)^(-1)             %0.79081* 40 * 1e5;
+X_C4  = 0.2;       % mol (s * L mito)^(-1)             %0.00010761 * 7e2;
+X_F   = 1e2;       % mol (s * L mito)^(-1)             %100; 
+E_ANT = 0.065;     % mol (L mito)^(-1)    %1.5*0.006762/7.2679e-003*(0.70e-1);
+E_PiC = 1e6;       % (L cell) (s * L mito)^(-1)        %3.3356e+07 * 2e-2; 
+E_H   = 3e2;       % mol (s * V * L mito)^(-1)
 X_CK  = 1e7;       % mol (s * L cyto)^(-1) 
 X_AtC = 0.5e-3;    % mol (s * L cyto)^(-1)
-X_AK  = 1e8;       % mol (s * L cyto)^(-1) 
 
 pars = [X_DH; X_C1; X_C3; X_C4; X_F; 
     E_ANT; E_PiC; E_H; 
-    X_CK; X_AtC; X_AK; 
+    X_CK; X_AtC; 
     ]; 
 
 %% Initial conditions 
@@ -117,19 +116,18 @@ NADH_x_0 = 2/3 * NAD_tot;  % mol (L matrix water)^(-1)
 QH2_x_0  = Q_tot/2;        % mol (L matrix water)^(-1)
 
 % IM species
-cred_i_0  = c_tot/3;        % mol (L IM water)^(-1)
+cred_i_0  = c_tot/2;        % mol (L IM water)^(-1)
 
 % Cytoplasmic species
 ATP_c_0 = 9.95e-3;        % mol (L cyto water)^(-1)
 ADP_c_0 = 0.05e-3;        % mol (L cyto water)^(-1)
-Pi_c_0  = 1.0e-3;         % mol (L cyto water)^(-1)
-AMP_c_0 = 1e-6;           % mol (L cyto water)^(-1)
+Pi_c_0  = 5.0e-3;         % mol (L cyto water)^(-1)
 CrP_c_0 = .3 * Cr_tot_c;  % mol (L cyto water)^(-1)
 
 x0 = [DPsi_0; 
     ATP_x_0; ADP_x_0; Pi_x_0; NADH_x_0; QH2_x_0; 
     cred_i_0; 
-    ATP_c_0; ADP_c_0; Pi_c_0; AMP_c_0; CrP_c_0; 
+    ATP_c_0; ADP_c_0; Pi_c_0; CrP_c_0; 
     ]; 
 
 %% Solve model and plot results
@@ -142,7 +140,7 @@ printed by setting printon = 1 in the Flags section.
 [t,x] = ode15s(@model,[0 60],x0,[],pars,conc,fixedpars,flags);
 
 % Find steady-state fluxes and polynomials 
-f = zeros(15,length(t)); 
+f = zeros(14,length(t)); 
 for i = 1:length(t)
     [~,f1] = model([],x(i,:),pars,conc,fixedpars,2); 
     f(:,i) = f1; 
@@ -167,8 +165,7 @@ cred_i = x(:,7) * 1e3;
 sumATP_c = x(:,8)  * 1e3; 
 sumADP_c = x(:,9)  * 1e3; 
 sumPi_c  = x(:,10) * 1e3; 
-sumAMP_c = x(:,11) * 1e3; 
-CrP_c    = x(:,12) * 1e3; 
+CrP_c    = x(:,11) * 1e3; 
 Cr_c     = Cr_tot_c * 1e3 - CrP_c;
 
 % convert to mmol (L cell)^(-1)
@@ -223,9 +220,9 @@ ylabel('Concentration (mmol (L matrix water)^{-1})')
 % Cytosplasm adenine species
 hfig4 = figure(4);
 clf
-plot(t,sumATP_c,'b',t,sumADP_c,'r',t,sumPi_c,'c',t,sumAMP_c,'k','linewidth',linethickness)
+plot(t,sumATP_c,'b',t,sumADP_c,'r',t,sumPi_c,'c','linewidth',linethickness)
 title('Cytoplasm species')
-legend('ATP','ADP','Pi','AMP')
+legend('ATP','ADP','Pi')
 xlabel('Time (s)')
 ylabel('Concentration (mmol (L cyto water)^{-1})')
 set(gca,'FontSize',fontsize)
@@ -268,26 +265,31 @@ rate increases.
 clear CrP_ATP
 
 % Range of ATP hydrolysis from 0.36 to 1.2e-3 mmol (s * L cell)^(-1)
-X_AtC = (0.1:0.1:1.52) * 1e-3 / V_c; % convert to mol (s * L cyto)^(-1)
+X_AtC = (0:0.1:1.52) * 1e-3 / V_c; % convert to mol (s * L cyto)^(-1)
 p = pars; 
 
 CrP_ATP = zeros(size(X_AtC)); 
 Pi_c = zeros(size(X_AtC)); 
+cred_i = zeros(size(X_AtC)); 
 for i = 1:length(X_AtC)
     p(10) = X_AtC(i); % reassign value for X_AtC
     [t,x] = ode15s(@model,[0 60],x0,[],p,conc,fixedpars,1);
     
     sumATP_x_cell = x(end,2) * (V_m * W_x); 
     sumATP_c_cell = x(end,8) * (V_c * W_c + V_m * W_i); 
-    CrP_c_cell    = x(end,12) * (V_c * W_c); 
+    CrP_c_cell    = x(end,11) * (V_c * W_c); 
     CrP_ATP(i)    = CrP_c_cell/(sumATP_c_cell + sumATP_x_cell); 
     
     Pi_c(i) = x(end,10); 
+    cred_i(i) = x(end,7) / c_tot; 
 end 
+
+% Convert mol (s * (L cyto))^(-1) to mmol (s * (L cell))^(-1)
+X_AtC = X_AtC * 1e3 * V_c; 
 
 hfig7 = figure(7);
 clf
-plot(X_AtC*1e3 * V_c,CrP_ATP,'b','linewidth',linethickness)
+plot(X_AtC,CrP_ATP,'b','linewidth',linethickness)
 xlabel('ATP consumption rate (mmol (s * L cell)^{-1})')
 ylabel('[CrP]/[ATP]')
 set(gca,'FontSize',fontsize)
@@ -296,12 +298,20 @@ xlim([0 1.5])
 
 hfig8 = figure(8);
 clf
-plot(X_AtC*1e3 * V_c,Pi_c*1e3,'b','linewidth',linethickness)
+plot(X_AtC,Pi_c*1e3,'b','linewidth',linethickness)
 xlabel('ATP consumption rate (mmol (s * L cell)^{-1})')
 ylabel('[Pi]_c (mol (L matrix water)^{-1})')
 set(gca,'FontSize',fontsize)
 xlim([0 1.5])
 ylim([0 ceil(max(Pi_c*1e3))])
+
+hfig9 = figure(9);
+clf
+plot(X_AtC,cred_i,'b','linewidth',linethickness)
+xlabel('ATP consumption rate (mmol (s * L cell)^{-1})')
+ylabel('[c^{2+}]_i / [c]_{tot}')
+set(gca,'FontSize',fontsize)
+xlim([0 1.5])
 
 if printon == 1
     savefig(hfig7,'CrP_ATP.fig')

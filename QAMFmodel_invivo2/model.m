@@ -26,7 +26,6 @@ E_PiC = pars(7);  % (L cell) (s * L mito)^(-1)
 E_H   = pars(8);  % mol (s * V * L mito)^(-1)
 X_CK  = pars(9);  % mol (s * L cyto)^(-1)
 X_AtC = pars(10); % mol (s * L cyto)^(-1)
-X_AK  = pars(11); % mol (s * L cyto)^(-1)
 
 %% Upack pH, cation concentrations and O2 partial pressure vector
 
@@ -49,8 +48,6 @@ O2_x = a_3 * PO2;   % mol (L matrix water)^(-1)
 %% Import fixed parameters and specifications 
 
 % Volume fractions and water space fractions 
-V_c   = fixedpars.fractions.V_c;        % (L cyto) (L cell)^(-1)
-V_m   = fixedpars.fractions.V_m;        % (L mito) (L cell)^(-1)
 V_m2c = fixedpars.fractions.V_m2c;      % (L mito) (L cyto)^(-1)
 W_c   = fixedpars.fractions.W_c;        % (L cyto water) (L cyto)^(-1)
 W_x   = fixedpars.fractions.W_x;        % (L matrix water) (L mito)^(-1)
@@ -85,9 +82,6 @@ K_KATP  = 10^(-1.02);
 K_MgADP = 10^(-3.00);  
 K_HADP  = 10^(-6.26);  
 K_KADP  = 10^(-0.89);
-K_MgAMP = 10^(-1.86); 
-K_HAMP  = 10^(-6.22); 
-K_KAMP  = 10^(-1.05); 
 K_MgPi  = 10^(-1.66);  
 K_HPi   = 10^(-6.62);  
 K_KPi   = 10^(-0.42);
@@ -111,8 +105,7 @@ cred_i = x(7);      % mol (L IM water)^(-1)
 sumATP_c = x(8);    % mol (L cyto water)^(-1)
 sumADP_c = x(9);    % mol (L cyto water)^(-1)
 sumPi_c  = x(10);   % mol (L cyto water)^(-1)
-sumAMP_c = x(11);   % mol (L cyto water)^(-1)
-CrP_c    = x(12);   % mol (L cyto water)^(-1)
+CrP_c    = x(11);   % mol (L cyto water)^(-1)
 
 % Other concentrations computed from the state variables:
 NAD_x = NAD_tot - NADH_x;  % mol (L matrix water)^(-1)
@@ -131,7 +124,6 @@ PPi_x  = 1 + H_x/K_HPi  + Mg_x/K_MgPi  + K_x/K_KPi;
 PATP_c = 1 + H_c/K_HATP + Mg_c/K_MgATP + K_c/K_KATP;
 PADP_c = 1 + H_c/K_HADP + Mg_c/K_MgADP + K_c/K_KADP;
 PPi_c  = 1 + H_c/K_HPi  + Mg_c/K_MgPi  + K_c/K_KPi;
-PAMP_c = 1 + H_c/K_HAMP + Mg_c/K_MgAMP + K_c/K_KAMP; 
 
 %% Unbound species 
 
@@ -141,7 +133,6 @@ Pi_x  = sumPi_x  / PPi_x;  % [HPO42-]_x
 
 ATP_c = sumATP_c / PATP_c; % [ATP4-]_c
 ADP_c = sumADP_c / PADP_c; % [ADP3-]_c
-AMP_c = sumAMP_c / PAMP_c; % [AMP2-]_c
 Pi_c  = sumPi_c  / PPi_c;  % [HPO42-]_c
 
 %% NADH Dehydrogenase
@@ -152,8 +143,7 @@ k_Pi1  = 0.1553e-3; % mol (L matrix water)^(-1)
 k_Pi2  = 0.8222e-3; % mol (L matrix water)^(-1)
 
 % Flux (mol (s * L mito)^(-1))
-J_DH = X_DH * (r * NAD_x - NADH_x) * ...
-    ((1 + sumPi_x / k_Pi1) / (1 + sumPi_x / k_Pi2));
+J_DH = X_DH * (r * NAD_x - NADH_x) * ((1 + sumPi_x / k_Pi1) / (1 + sumPi_x / k_Pi2));
 
 %% Complex I
 % NADH_x + Q_x + 5 H+_x <-> NAD+_x + QH2_x + 4 H+_c + 4 DPsi
@@ -195,8 +185,7 @@ Keq_C4  = exp(-(DrGo_C4 + n_C4 * F * DPsi) / (R * T));
 Kapp_C4 = Keq_C4 * H_x^n_C4 / H_c^(n_C4 - 2);
     
 % Flux (mol (s * L mito)^(-1))
-J_C4 = X_C4 *(Kapp_C4 * cred_i^2 * O2_x^0.5 - cox_i^2) * ...
-    (1 / (1 + k_O2 / O2_x));
+J_C4 = X_C4 *(Kapp_C4 * cred_i^2 * O2_x^0.5 - cox_i^2) * (1 / (1 + k_O2 / O2_x));
 
 %% F0F1-ATPase
 % ADP3-_x + HPO42-_x + H+_x + 8/3 H+_i <-> ATP4- + H2O + 8/3 H+_x
@@ -206,7 +195,7 @@ DrGo_F = -4510;
 
 % Equilibrium constants (dimensionless)
 Keq_F  = exp(-(DrGo_F - n_F * F * DPsi) / (R * T));
-Kapp_F = Keq_F * H_c^n_F / H_x^(n_F-1) * PATP_x / (PADP_x * PPi_x) * K_MgATP / K_MgADP;
+Kapp_F = Keq_F * H_c^n_F / H_x^(n_F - 1) * PATP_x / (PADP_x * PPi_x);% * K_MgATP / K_MgADP;
 
 % Flux (mol (s * L mito)^(-1))
 J_F = X_F * (Kapp_F * sumADP_x * sumPi_x - sumATP_x);
@@ -261,7 +250,8 @@ J_PiC = E_PiC * (H_c * HPi_c - H_x * HPi_x) / (k_PiC + HPi_c);
 % ADP3- + CrP2- + H+ = ATP4- + Cr
 
 % Equilibrium constants (dimensionless)
-Keq_CK  = 3.5e8; 
+% Keq_CK  = 7.408e8; % OLD value
+Keq_CK  = 3.5e8; % NEW value
 Kapp_CK = Keq_CK * H_c * PATP_c / PADP_c;
 
 % Flux (mol (s * L cyto)^(-1))
@@ -273,20 +263,10 @@ J_CK = X_CK * (Kapp_CK * ADP_c * CrP_c - ATP_c * Cr_c);
 %Flux (mol (s * L cyto)^(-1))
 J_AtC = X_AtC; 
 
-%% Adenylate kinase 
-% 2 ADP3- = ATP4- + AMP2- 
-
-% Equilibrium constants (dimensionless)
-Keq_AK  = 3.97e-1; 
-Kapp_AK = Keq_AK * PATP_c * PAMP_c / PADP_c^2; 
-
-% Flux (mol (s * L cyto)^(-1))
-J_AK = X_AK * (Kapp_AK * ADP_c^2 - AMP_c * ATP_c); 
-
 %% H+ Leak
 
 % Flux (mol (s * L mito)^(-1))
-J_H = E_H * DPsi * (H_c * exp(phi) - H_x) / (exp(phi) - 1); 
+J_H = E_H * (H_c * exp(phi/2) - H_x * exp(-phi/2));
 
 %% Computing time derivatives of state variables
 
@@ -304,23 +284,22 @@ dQH2_x  = (J_C1 - J_C3) / W_x;
 dcred_i = 2 * (J_C3 - J_C4) / W_i; 
 
 % Buffer species
-dATP_c = ( V_m2c * J_ANT - J_AtC + J_CK + J_AK) / W_c;  
-dADP_c = (-V_m2c * J_ANT + J_AtC - J_CK - 2*J_AK) / W_c; 
+dATP_c = ( V_m2c * J_ANT - J_AtC + J_CK) / W_c;  
+dADP_c = (-V_m2c * J_ANT + J_AtC - J_CK) / W_c; 
 dPi_c  = (-V_m2c * J_PiC + J_AtC) / W_c; 
-dAMP_c = J_AK / W_c; 
 dCrP_c = -J_CK / W_c;
 
 if flags == 1
     dxdt = [dDPsi; 
         dATP_x; dADP_x; dPi_x; dNADH_x; dQH2_x; 
         dcred_i; 
-        dATP_c; dADP_c; dPi_c; dAMP_c; dCrP_c]; 
+        dATP_c; dADP_c; dPi_c; dCrP_c]; 
 else
     dxdt = []; 
     f = [PATP_x; PADP_x; PPi_x;
         PATP_c; PADP_c; PPi_c; 
         J_DH; J_C1; J_C3; J_C4; 
-        J_F; J_ANT; J_PiC; J_CK; J_AK; 
+        J_F; J_ANT; J_PiC; J_CK; 
         ]; 
 end 
 
