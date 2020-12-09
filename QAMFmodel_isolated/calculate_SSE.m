@@ -22,23 +22,8 @@ E_H = 2e3; % 1e3
 
 flags = 1;
 
-MVO2_high_data = [14.509
-    53.625
-    77.07
-    108.57
-    144.36];
-
-NADH_norm_high_data = [0.6642
-    0.4821
-    0.3901
-    0.3688
-    0.3695];
-
-ADP_high_data = [0
-    0.0049
-    0.0578
-    0.1648
-    0.4716];
+% Load Data 
+load vinnakota.mat;
 
 %% Parameters defining metabolite pools
 
@@ -130,16 +115,8 @@ x0 = [DPsi_0;
     ATP_c_0; ADP_c_0; Pi_c_0;
     ];
 
-
-opts = odeset('NonNeg',2:10);
-
 % range of ATP consumption rates
 X_AtC = (0:0.1:8)*1e-6;  % Increase max hydrolysis to find apparent Km.
-%X_AtC = (0:0.6:50)*1e-6;
-
-clear JO2
-clear ADP
-clear DPsi
 
 opts = odeset('NonNeg',2:10);
 
@@ -153,22 +130,51 @@ for i = 1:length(X_AtC)
 
    % Units to match with Bazil
    O2Conv = 1/ 2 * V_mito_total / X_CS * 60 * 1e9;
-   JO2(i) = J_C4 / 2 * V_mito_total / X_CS * 60 * 1e9;
+   JO2_hi(i) = J_C4 / 2 * V_mito_total / X_CS * 60 * 1e9;
 
-   ADP(i) = x(end,9);
-   DPsi(i) = x(end,1);
-   NADH(i) = x(end,5);
-   cred(i) = x(end,7);
-   Pi_c(i) = x(end,10); 
+   ADP_hi(i) = x(end,9);
+   DPsi_hi(i) = x(end,1);
+   NADH_hi(i) = x(end,5);
+   cred_hi(i) = x(end,7);
+   Pi_c_hi(i) = x(end,10); 
 end
 
+%% Low Pi Concentration
+Pi_c_0 = 1.5e-3;
 
+
+x0 = [DPsi_0;
+    ATP_x_0; ADP_x_0; Pi_x_0; NADH_x_0; QH2_x_0;
+    cred_i_0;
+    ATP_c_0; ADP_c_0; Pi_c_0;
+    ];
+
+% looping through different ATP consumptions states
+for i = 1:length(X_AtC)
+   pars = [X_DH; X_C1; X_C3; X_C4; X_F1F0; E_ANT; E_PiC; E_H; X_AtC(i)];
+   % run for long time to acheive steady-state
+   [t,x] = ode15s(@Mito_dXdT,[0 800],x0,opts,pars,conc,fixedpars,1);
+   [f,J] = Mito_dXdT(0,x(end,:),pars,conc,fixedpars,2);
+   J_C4 = J(10);
+
+   % Units to match with Bazil
+   O2Conv = 1/ 2 * V_mito_total / X_CS * 60 * 1e9;
+   JO2_low(i) = J_C4 / 2 * V_mito_total / X_CS * 60 * 1e9;
+
+   ADP_low(i) = x(end,9);
+   DPsi_low(i) = x(end,1);
+   NADH_low(i) = x(end,5);
+   cred_low(i) = x(end,7);
+   Pi_c_low(i) = x(end,10); 
+end
+
+%% Residuals and Fitting
 % Calculate residuals for ADP
-f=fit(ADP_high_data, MVO2_high_data,'linearinterp');
-ADP_range = ADP((ADP*1e3 <= max(ADP_high_data)));
+f=fit(ADP_hi_pi, JO2_hi_pi,'linearinterp');
+ADP_range = ADP_hi((ADP_hi*1e3 <= max(ADP_hi_pi)));
 linear_int_JO2 = f(ADP_range.*1e3)';
-resid_ADP = JO2(ADP*1e3 <= max(ADP_high_data)) - linear_int_JO2;
-%resid_ADP = ADP_high_data- interp1(JO2, ADP*1e3,MVO2_high_data );
+resid_ADP = JO2_hi(ADP_hi*1e3 <= max(ADP_hi_pi)) - linear_int_JO2;
+%resid_ADP = ADP_hi_pi- interp1(JO2, ADP*1e3,JO2_hi_pi );
 
 % % Remove NaN;
 % resid_ADP = resid_ADP(~isnan(resid_ADP));
@@ -176,42 +182,42 @@ SSE_adp = sum((resid_ADP).^2);
 
 
 % Calculate Residuals for NADH_rel
-% resid_NADH_nonrm = MVO2_high_data - interp1(NADH/NAD_tot,JO2,NADH_norm_high_data);
+% resid_NADH_nonrm = JO2_hi_pi - interp1(NADH/NAD_tot,JO2,NADH_hi_pi);
 
 % resid_NADH_nonrm = resid_NADH_nonrm(~isnan(resid_NADH_nonrm)); % Remove NaN
 % SSE_NADH_norm = sum((resid_NADH_nonrm).^2);
 
 SSE_total = SSE_adp ;% + SSE_NADH_norm;
-% SSE_total  = SSE_NADH_norm;
+
+
 if plotting == 1
-%     figure();
-%     plot(ADP*1e3, JO2);
-%     hold on;
-%     plot(ADP_high_data,MVO2_high_data, 'o');
-%     xlabel('ADP (mM)');
-%     ylabel('VO2 nmoll O2 / min / U CS')
-% 
-%     figure();
-%     plot(JO2, NADH/NAD_tot);
-%     hold on;
-%     plot(MVO2_high_data, NADH_norm_high_data,   'o');
     figure();
-    subplot(2,2,1); plot(JO2, NADH/NAD_tot); hold on;
-    plot(MVO2_high_data, NADH_norm_high_data, 'o');
+    subplot(2,2,1); plot(JO2_hi, NADH_hi/NAD_tot); hold on;
+    plot(JO2_hi_pi, NADH_hi_pi, '+');
+    plot(JO2_low, NADH_low/NAD_tot); 
+    plot(JO2_low_pi, NADH_low_pi, '+');
     xlabel('J_{O2}');
     ylabel('NADH (normalized)');
+    legend('5 mM Pi','5 mM Pi Data','1 mM Pi','1 mM Pi Data');
 
-    subplot(2,2,2);plot(JO2,DPsi*1e3)
+    subplot(2,2,2);plot(JO2_hi,DPsi_hi*1e3); hold on;
+    plot(JO2_hi_pi_few, deltaPsi_hi_pi,'+');
+    plot(JO2_low,DPsi_low*1e3);
+    plot(JO2_low_pi_few, deltaPsi_low_pi,'+');
     ylabel('DPsi (mV)');
     xlabel('J_{O2}');
 
-    subplot(2,2,3);plot(JO2, cred/c_tot)
+    subplot(2,2,3);plot(JO2_hi, cred_hi/c_tot); hold on;
+    plot(JO2_hi_pi_few, cytC_hi_pi,'+');
+    plot(JO2_low, cred_low/c_tot);
+    plot(JO2_low_pi_few, cytC_low_pi,'+');
     xlabel('J_{O2}');
     ylabel('Cytochrome C_{red} (normalized)');
 
-    subplot(2,2,4); plot(ADP*1e3, JO2); hold on;
-    plot(ADP_high_data,MVO2_high_data, 'o');
-
+    subplot(2,2,4); plot(ADP_hi*1e3, JO2_hi); hold on;
+    plot(ADP_hi_pi,JO2_hi_pi, '+');
+    plot(ADP_low*1e3, JO2_low);
+    plot(ADP_low_pi,JO2_low_pi, '+');
     ylabel('J_{O2}');
     xlabel('ADP (mM)');
 end
