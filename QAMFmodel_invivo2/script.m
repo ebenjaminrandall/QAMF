@@ -48,7 +48,7 @@ fixedpars.pools.c_tot = c_tot;
 fixedpars.pools.Cr_tot_c = Cr_tot_c; 
 
 % Membrane capacitance 
-Cm = 3e-6;       % mol (V * L mito)^(-1)
+Cm = 3e-3;       % mol (V * L mito)^(-1)
 
 fixedpars.capacitance.Cm = Cm; 
 
